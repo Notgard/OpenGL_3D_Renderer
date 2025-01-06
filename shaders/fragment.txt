@@ -1,0 +1,84 @@
+#version 330 core
+
+out vec4 FragColor;
+
+in mat3 normal_matrix;
+in vec3 norm;
+in vec2 textureCoordV;
+
+in vec4 vertexColor;
+
+in vec3 worldPosition;
+
+int textureMapping = 0;
+
+uniform vec3  cameraPosition;
+uniform vec3  lightPosition;
+uniform vec3  lightColor;
+uniform float lightIntensity;
+
+uniform vec4  lightAmbient;
+uniform vec4  lightDiffuse;
+uniform float lightSpecular;
+
+vec4 computePhong(  vec3 light, vec4 lightcol, vec3 pos, vec3 norm, vec3 camPos, float specPower, vec4 ambiant, vec4 diffuse, vec4 specStrength, vec4 specExponent)
+{
+    vec3 normal = normalize(norm);
+
+    //Ambiante
+    //Ka * Ia (ambiant coeff * ambiant color)
+    //ambiant = ambiant * vec4(0.1, 0.1, 0.1, 1.);
+
+    //Diffuse
+    vec3 lightDir = normalize(light - pos);
+	
+	//angle diffusion
+	float diffAngle = dot(normal,lightDir); //(N.L)
+    float lambertian = max(diffAngle, 0.0); //max((N.L), 0.0)
+	diffuse.rgb *= lambertian; //multiplication en conservant l'alpha original
+	//diffuse = diffuse * diffAngle;
+
+    //Speculaire	
+    vec3 reflectDir = normalize(reflect(-lightDir, normal)); //R
+    vec3 viewDir = normalize(camPos-pos); //V
+	
+	//max(V . R, 0)^specPower
+    float specAngle = max(dot(reflectDir, viewDir), 0.0);
+    float specular = pow(specAngle, specPower);
+
+    //Ks(specstrength) * Is(lightcol) * max(V . R, 0)^specPower
+    vec4 specular_val;
+    if(textureMapping == 1)
+	    specular_val = (128*specExponent) * lightcol * specular;
+
+	//lumière ambiante et diffuse
+	//vec3 amb_diff = ambiant.rgb*lightcol.rgb + diffuse.rgb*lightcol.rgb;
+	//vec4 amb_diff = ambiant+diffuse;
+
+    vec4 res;
+    if(textureMapping == 1)
+        res = (ambiant*lightcol + diffuse*lightcol) + specStrength * specular_val;
+    else
+        res = (ambiant*lightcol + diffuse*lightcol) + specular;
+    return  res;
+}
+
+void main()
+{
+    //FragColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
+    //norm = normalize(norm);
+    vec4 phong_lighting = computePhong(
+        lightPosition,
+        vec4(lightColor, 1.0),
+        worldPosition,
+        norm,
+        cameraPosition,
+        lightSpecular,
+        lightAmbient,
+        lightDiffuse, 
+        vec4(0.), 
+        vec4(0.)
+    );
+    FragColor = phong_lighting * vertexColor;
+    //FragColor = vertexColor;
+}   

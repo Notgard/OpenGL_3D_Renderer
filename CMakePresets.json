@@ -1,0 +1,108 @@
+{
+    "version": 3,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 21,
+        "patch": 0
+    },
+    "configurePresets": [
+        {
+            "name": "default",
+            "displayName": "Default configuration",
+            "description": "Default configuration with all the options set to their default values",
+            "binaryDir": "${sourceDir}/build/",
+            "installDir": "${sourceDir}/install/",
+            "generator": "Ninja",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": {
+                    "type": "STRING",
+                    "value": "Release"
+                },
+                "CMAKE_TOOLCHAIN_FILE" : {
+                    "type": "STRING",
+                    "value": "conan_toolchain.cmake"
+                },
+                "CMAKE_PREFIX_PATH": {
+                    "type": "PATH",
+                    "value": "./build/Release/generators"
+                },
+                "CMAKE_INSTALL_PREFIX": {
+                    "type": "PATH",
+                    "value": "./install"
+                }
+            }
+        },
+        {
+            "name": "conan",
+            "inherits": "default",
+            "displayName": "Conan",
+            "cacheVariables": {
+                "USING_PACKAGE_MANAGER_CONAN": {
+                    "type": "BOOL",
+                    "value": true
+                },
+                "CONAN_DISABLE_CHECK_COMPILER": {
+                    "type": "BOOL",
+                    "value": true
+                }
+            }
+        },
+        {
+            "name": "vcpkg-default-triplet",
+            "inherits": "default",
+            "displayName": "vcpkg | default triplet",
+            "cacheVariables": {
+                "USING_PACKAGE_MANAGER_VCPKG": {
+                    "type": "BOOL",
+                    "value": true
+                },
+                "CMAKE_TOOLCHAIN_FILE": {
+                    "type": "FILEPATH",
+                    "value": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+                }
+            }
+        },
+        {
+            "name": "vcpkg-windows-static",
+            "inherits": "vcpkg-default-triplet",
+            "displayName": "vcpkg | Windows | static",
+            "cacheVariables": {
+                "VCPKG_TARGET_TRIPLET": {
+                    "type": "STRING",
+                    "value": "x64-windows-static"
+                },
+                "CRT_LINKAGE_STATIC": {
+                    "type": "BOOL",
+                    "value": true
+                }
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "default",
+            "configurePreset": "default",
+            "targets": "install"
+        },
+        {
+            "name": "conan",
+            "configurePreset": "conan",
+            "targets": "install"
+        },
+        {
+            "name": "vcpkg-default-triplet",
+            "configurePreset": "vcpkg-default-triplet",
+            "targets": "install"
+        },
+        {
+            "name": "vcpkg-windows-static",
+            "configurePreset": "vcpkg-windows-static",
+            "targets": "install"
+        },
+        {
+            "name": "conan_build",
+            "description": "",
+            "displayName": ""
+        }
+    ]
+}

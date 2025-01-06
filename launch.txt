@@ -1,0 +1,3 @@
+launch applicaiton with the following command:
+MESA_GL_VERSION_OVERRIDE=4.3 ./build/Release/glfw-imgui
+the previous flag is due to mismatch of the opengl version (might detect the wrong gl version"

@@ -1,0 +1,14 @@
+build
+install
+
+.vscode
+.cache
+
+_dependencies/glad/*
+_dependencies/glfw/*
+_dependencies/DearImGui/*
+!.gitkeep
+
+*.sublime-workspace
+
+compile_commands.json

@@ -8,16 +8,21 @@ Minimal OpenGL 3D Renderer made using ImGui for UI, GLFW and GLAD for OpenGL and
 There are two ways to build this project:  
 * Use the provided bash scripts to execute the necessary command (for ease of life). The scripts included for installing the libraries via Conan and build the project with CMake and re-compile the project are build.sh and rebuild.sh respectively
 * Use the below commands manually:
+
+First off, clone the repository:
 ```bash
-#in case build directory is missing
-#mkdir build
+git clone https://github.com/Notgard/OpenGL_3D_Renderer.git && cd OpenGL_3D_Renderer
+```
+And now execute the following commands:
+```bash
+mkdir -p build
 cd build
 conan install .. --update --build=missing --remote=conancenter
 cmake -G Ninja -DCMAKE_BUILD_TYPE=Release\
    -DCMAKE_INSTALL_PREFIX="../install"\
    -DUSING_PACKAGE_MANAGER_CONAN=1\
-   -DCMAKE_PREFIX_PATH="./build/Release/generators"\
-   -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake\
+   -DCMAKE_PREFIX_PATH="./Release/generators"\
+   -DCMAKE_TOOLCHAIN_FILE=./Release/generators/conan_toolchain.cmake\
    ..
 cmake --build . --target install
 ```

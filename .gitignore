@@ -1,5 +1,6 @@
 build
 install
+old
 
 .vscode
 .cache
@@ -8,6 +9,7 @@ _dependencies/glad/*
 _dependencies/glfw/*
 _dependencies/DearImGui/*
 !.gitkeep
+CMakeFiles
 
 *.sublime-workspace
 

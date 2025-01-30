@@ -6,7 +6,7 @@
 #define WINDOW_HEIGHT 800
 
 #define FONT_NAME "includes/JetBrainsMono-ExtraLight.ttf"
-#define PROGRAM_NAME "CHIP 8 Emulator"
+#define PROGRAM_NAME "3D Renderer"
 
 // shader
 #define SHADER_FOLDER "/shaders/"

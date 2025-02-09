@@ -5,6 +5,8 @@
 
 #include <vector>
 
+#include "config.h"
+
 enum AttributeLocation {
     POSITION = 0,
     TEX_COORDS = 1,
@@ -39,8 +41,10 @@ namespace renderer
             void draw(GLenum draw_mode, int index_count);
 
             void set_color(bool is_color) { this->is_color = is_color; }
+            int get_index_count() { return num_indices; }
         
         private:
             bool is_color = false;
+            int num_indices;
     };
 }

@@ -21,18 +21,40 @@ bool OGLWindow::init(int width, int height, const std::string &title)
     ogl->init(this);
     ui->init(this);
 
-    sceneView = new SceneView();
-    menuBar = new MenuBarComponent();
+    if (cmd_arguments.size() > 0)
+    {
+        sceneView = new ui::SceneView(cmd_arguments);
+    }
+    else
+    {
+        sceneView = new ui::SceneView();
+    }
+    menuBar = new ui::MenuBarComponent();
 
     return isRunning;
 }
 
 void OGLWindow::render()
 {
+    currentFrame = glfwGetTime();
+    deltaTime = currentFrame - lastFrame;
+    lastFrame = currentFrame;
+    fps = 1.0 / deltaTime;
+
+    sceneView->set_fps(fps);
+
+    //std::cout << "FPS: " << fps << std::endl;
+
+    Camera *camera = sceneView->get_camera();
+    inputHandler->process_camera_movement(camera, deltaTime);
+
+    //std::cout << "Pre-render" << std::endl;
     ogl->pre_render();
     ui->pre_render();
 
-    //menuBar->render();
+    //std::cout << "Render" << std::endl;
+
+    menuBar->render(sceneView);
     sceneView->render();
 
     ui->post_render();
@@ -51,16 +73,44 @@ void OGLWindow::input_handler()
         isRunning = false;
     }
 
-    if(!sceneView->available_input()) {
+    if (menuBar->available_input())
+    {
         return;
     }
 
-    if (glfwGetMouseButton(window, 0) == GLFW_PRESS)
-        sceneView->on_mouse_move(x, y, MouseButtons::LEFT_CLICK);
-    else if (glfwGetMouseButton(window, 1) == GLFW_PRESS)
-        sceneView->on_mouse_move(x, y, MouseButtons::RIGHT_CLICK);
-    else if (glfwGetMouseButton(window, 2) == GLFW_PRESS)
-        sceneView->on_mouse_move(x, y, MouseButtons::MIDDLE_CLICK);
+    if (!sceneView->available_input())
+    {
+        return;
+    }
+
+    // Check if any mouse button is pressed
+    bool leftPressed = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
+    bool rightPressed = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS;
+    bool middlePressed = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS;
+
+    if (leftPressed || rightPressed || middlePressed)
+    {
+        if (mousePressed) // Only move if the mouse has changed position
+        {
+            if (x != lastX || y != lastY)
+            {
+                if (leftPressed)
+                    sceneView->on_mouse_move(x, y, MouseButtons::LEFT_CLICK);
+                else if (rightPressed)
+                    sceneView->on_mouse_move(x, y, MouseButtons::RIGHT_CLICK);
+                else if (middlePressed)
+                    sceneView->on_mouse_move(x, y, MouseButtons::MIDDLE_CLICK);
+            }
+        }
+        mousePressed = true;
+    }
+    else
+    {
+        mousePressed = false; //reset
+    }
+
+    lastX = x;
+    lastY = y;
 }
 
 void OGLWindow::on_key(int key, int scancode, int action, int mods)
@@ -74,7 +124,12 @@ void OGLWindow::set_window_size(int width, int height)
 
 void OGLWindow::on_scroll(double delta)
 {
+    if (menuBar->available_input())
+    {
+        return;
+    }
     sceneView->on_mouse_wheel(delta * 0.5f);
+    menuBar->update_camera_configuration(sceneView);
 }
 
 void OGLWindow::on_resize(int width, int height)

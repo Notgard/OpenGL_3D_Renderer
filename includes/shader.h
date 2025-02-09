@@ -15,13 +15,11 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-// TODO: create a class for OpenGL shader to encapsulate the shader program
-
 // build and compile our shader program
-void buildShaderProgram(unsigned int &shaderProgram, unsigned int &VBO, unsigned int &VAO, unsigned int &FBO, const char *vertexShaderSource, const char *fragmentShaderSource);
-void renderToFramebuffer(unsigned int &FBO, unsigned int &VAO, unsigned int &shaderProgram);
-void bindFrameBuffer(unsigned int &FBO, int width, int height);
-void unbindFrameBuffer();
+//void buildShaderProgram(unsigned int &shaderProgram, unsigned int &VBO, unsigned int &VAO, unsigned int &FBO, const char *vertexShaderSource, const char *fragmentShaderSource);
+//void renderToFramebuffer(unsigned int &FBO, unsigned int &VAO, unsigned int &shaderProgram);
+//void bindFrameBuffer(unsigned int &FBO, int width, int height);
+//void unbindFrameBuffer();
 
 class Shader
 {
@@ -48,6 +46,7 @@ public:
     void set_vec3(const std::string &name, const glm::vec3 &value);
     void set_vec4(const std::string &name, const glm::vec4 &value);
     void set_float(const std::string &name, float value);
+    void set_int(const std::string &name, int value);
 };
 
 #endif // !__SHADER_H__

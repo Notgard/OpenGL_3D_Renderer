@@ -31,6 +31,7 @@ set(sources
     src/main.cpp
     src/menu_bar.cpp
     src/mesh.cpp
+    src/object.cpp
     src/ogl_window.cpp 
     src/ogl.cpp 
     src/scene_view.cpp 
@@ -49,6 +50,7 @@ set(headers
     includes/input_handler.h 
     includes/menu_bar.h
     includes/mesh.h
+    includes/object.h
     includes/ogl_window.h 
     includes/ogl.h 
     includes/render.h 

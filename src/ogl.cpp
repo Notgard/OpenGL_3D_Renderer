@@ -147,7 +147,7 @@ namespace renderer
         //glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_MEDIUM, 0, NULL, GL_TRUE);
 
         // VSync
-        glfwSwapInterval(1);
+        glfwSwapInterval(VSYNC);
 
         std::cout << "[INFO] OpenGL from GLFW "
                   << glfwGetWindowAttrib(glfWindow, GLFW_CONTEXT_VERSION_MAJOR)
@@ -183,7 +183,7 @@ namespace renderer
     void OGLRender::pre_render()
     {
         glViewport(0, 0, window->width, window->height);
-        glClearColor(0.2f, 0.2f, 0.2f, background_color[3]);
+        glClearColor(BACKGROUND_R, BACKGROUND_G, BACKGROUND_B, BACKGROUND_A);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 

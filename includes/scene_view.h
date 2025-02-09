@@ -1,8 +1,11 @@
+#pragma once
+
 #include "shader.h"
 #include "buffer.h"
 #include "mesh.h"
 #include "camera.h"
 #include "light.h"
+#include "object.h"
 
 #include "config.h"
 
@@ -15,56 +18,17 @@
 #include "functions.h"
 #include "imgui-style.h"
 
+#include <tuple>
+#include <memory>
+
 namespace ui
 {
     class SceneView
     {
     public:
-        SceneView() : width(OGL_SCENE_WIDTH), height(OGL_SCENE_HEIGHT)
-        {
-            // create buffers
-            frameBuffer = new renderer::OGLFrameBuffer();
-            frameBuffer->create_buffers(width, height);
+        SceneView();
 
-            vertexBuffer = new renderer::OGLVertexBuffer();
-            float axis_length = 6.0f;
-            std::vector<float> vertices = {
-                // Position           // Color (RGBA)
-                // X-axis (Red)
-                0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,        // Start
-                axis_length, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, // End
-
-                // Y-axis (Green)
-                0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,        // Start
-                0.0f, axis_length, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, // End
-
-                // Z-axis (Blue)
-                0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f,        // Start
-                0.0f, 0.0f, axis_length, 0.0f, 0.0f, 1.0f, 1.0f, // End
-            };
-            std::vector<unsigned int> indices = {
-                0, 1, // X-axis
-                2, 3, // Y-axis
-                4, 5  // Z-axis
-            };
-            vertexBuffer->set_color(true);
-            vertexBuffer->create_buffers(vertices, indices);
-
-            shader = new Shader();
-
-            std::filesystem::path currentPath = std::filesystem::current_path();
-            std::string vertexShader = shader->read_shader(currentPath.string(), VERTEX_SHADER);
-            std::string fragmentShader = shader->read_shader(currentPath.string(), FRAGMENT_SHADER);
-            shader->compile_and_load(vertexShader.c_str(), fragmentShader.c_str());
-
-            meshHandler = new MeshHandler();
-            meshHandler->load_mesh("models/teapot.obj");
-
-            camera = new Camera();
-
-            Light *light = new Light();
-            lights.push_back(light);
-        };
+        SceneView(std::vector<std::string> cmd_arguments);
 
         ~SceneView()
         {
@@ -75,6 +39,7 @@ namespace ui
             safe_delete(vertexBuffer);
             safe_delete(frameBuffer);
             safe_delete(meshHandler);
+            //safe_delete(objectHandler);
             safe_delete(camera);
             // delete lights
             for (auto light : lights)
@@ -82,6 +47,8 @@ namespace ui
                 safe_delete(light);
             }
         };
+
+        std::tuple<std::vector<float>, std::vector<unsigned int>> init_scene_vectors();
 
         void resize(int width, int height);
 
@@ -95,6 +62,29 @@ namespace ui
 
         bool available_input() { return enable_input; }
 
+        std::vector<Light *> get_lights() { return lights; }
+
+        Shader *get_shader() { return shader; }
+
+        void set_fps(double fps) { this->fps = fps; }
+        double get_fps() { return fps; }
+
+        double get_polygon_count()
+        { 
+            return objectHandler->get_polygon_count();
+        }
+
+        bool get_enable_grid() { return enable_grid; }
+        void set_enable_grid(bool enable) { enable_grid = enable; }
+
+        bool get_enable_gizmo() { return enable_gizmo; }
+        void toggle_gizmo()
+        {
+            //enable_gizmo = !enable_gizmo;
+            //objectHandler->toggle_object(GIZMO_INDEX, enable_gizmo);
+            objectHandler->toggle_object(GIZMO_INDEX);
+        }
+
     private:
         int width;
         int height;
@@ -102,8 +92,14 @@ namespace ui
         renderer::OGLFrameBuffer *frameBuffer;
         renderer::OGLVertexBuffer *vertexBuffer;
         MeshHandler *meshHandler;
+        //ObjectHandler *objectHandler;
+        std::unique_ptr<ObjectHandler> objectHandler;
+
         Camera *camera;
         std::vector<Light *> lights;
         bool enable_input = true;
+        bool enable_grid = true;
+        bool enable_gizmo = true;
+        double fps;
     };
 }

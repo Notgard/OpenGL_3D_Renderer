@@ -66,7 +66,7 @@ namespace renderer
     void OGLFrameBuffer::clear()
     {
         glViewport(0, 0, this->width, this->height);
-        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        glClearColor(BACKGROUND_R, BACKGROUND_G, BACKGROUND_B, BACKGROUND_A);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
@@ -110,6 +110,8 @@ namespace renderer
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
+
+        this->num_indices = indices.size();
     }
 
     void OGLVertexBuffer::create_buffers(const std::vector<Vertex> &vertices, const std::vector<unsigned int> &indices)
@@ -146,6 +148,8 @@ namespace renderer
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
+
+        this->num_indices = indices.size();
     }
 
     void OGLVertexBuffer::delete_buffers()

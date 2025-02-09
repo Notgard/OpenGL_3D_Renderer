@@ -10,6 +10,8 @@
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtx/string_cast.hpp>
 
+#include "config.h"
+
 enum class CameraMovement
 {
 	FORWARD,
@@ -36,15 +38,25 @@ public:
 	glm::mat4 get_view_matrix();
 	glm::mat4 get_projection_matrix();
 	glm::mat4 get_translation_matrix();
+	glm::mat4 get_rotation_matrix();
 
 	void update_view_matrix();
 	void update_projection_matrix();
 
+	glm::vec3 get_position() const { return this->position; };
 	void set_position(const glm::vec3 &position);
+	
 	void set_near(const float near);
+	float get_near() const { return this->near; }
+
 	void set_far(const float far);
+	float get_far() const { return this->far; }
+
+	float get_fov() const { return this->fov; }
+
 	void set_aspect_ratio(const float aspectRatio);
-	void move(CameraMovement movement);
+
+	void move(CameraMovement movement, float velocity);
 	void update(Shader *shader);
 	void reset();
 
@@ -64,14 +76,24 @@ public:
 	void on_mouse_wheel(double delta);
 	void on_mouse_move(double x, double y, int width, int height, MouseButtons button);
 
+	void print_camera();
+	void switch_camera_mode();
+
+	float get_move_speed() const { return move_speed; }
+	bool is_free_camera() const { return free_camera; }
+
+	void load_config(Configuration *config);
+
 private:
 	glm::vec2 get_mouse_delta(double x, double y);
 
-	glm::vec3 position{0.0f, 0.0f, 0.0f};
+	glm::vec3 init_position{-6.4f, 5.3f, -6.0f};
+	glm::vec3 position = init_position;
 
+	glm::vec3 target{0.0f, 0.0f, 0.0f}; // target center
 	glm::vec3 up{0.0f, 1.0f, 0.0f};
 	glm::vec3 right{ 1.0f, 0.0f, 0.0f };
-	glm::vec3 direction{0.0f, 0.0f, -1.0f}; // defaults to looking down the z axis in OpenGL
+	glm::vec3 direction{0.0f, 0.0f, -11.0f}; // always looking at Z axis 
 	glm::vec3 direction_right = glm::normalize(glm::cross(direction, up)); //strafe vector
 	glm::vec3 direction_up = glm::normalize(glm::cross(direction_right, direction));
 
@@ -87,15 +109,21 @@ private:
 	float near;
 	float far;
 
-	float pitch = 0.0f;
-	float yaw = 0.0f;
+	float init_pitch = 0.3f;
+	float pitch = init_pitch;
+	float init_yaw = -4.0f;
+	float yaw = init_yaw;
 	float roll = 0.0f;
 
-	float rotation_speed = 4.0;
-	float move_speed = 3.0;
+	float rotation_speed = 3.0f;
+	float move_speed = 3.5f;
+	float zoom_speed = 0.1f;
+
+	float mouse_sensitivity = 0.1f;
 
 	bool update_view = false;
 	bool update_projection = false;
+	bool free_camera = true;
 
 	// mouse inputs
 	double lastX = DEFAULT_MOUSE;

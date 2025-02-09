@@ -2,7 +2,8 @@
 
 int main(int argc, char *argv[])
 {
-    auto app = new App("OpenGL App");
+    std::vector<std::string> arguments(argv + 1, argv + argc);
+    auto app = new App("OpenGL App", arguments);
     app->run();
 
     return 0;

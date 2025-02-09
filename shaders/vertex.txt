@@ -27,7 +27,7 @@ void main()
     norm = vec3(normMatrix * normal);
 
     vec2 uv = position.xy/2.0 + vec2(0.5);
-    textureCoordV = vec2(uv.xy);
+    //textureCoordV = vec2(tex_coords.xy);
 
     //gl_Position = vec4(position.x, position.y, position.z, 1.0);
     gl_Position = projection * view * model * vec4(position, 1.0);

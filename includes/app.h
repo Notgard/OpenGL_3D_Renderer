@@ -3,7 +3,7 @@
 class App
 {
 public:
-    App(const std::string &name);
+    App(const std::string &name, std::vector<std::string>);
     ~App();
 
     void run();

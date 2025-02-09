@@ -10,7 +10,7 @@ in vec4 vertexColor;
 
 in vec3 worldPosition;
 
-int textureMapping = 0;
+uniform int textureMapping;
 
 uniform vec3  cameraPosition;
 uniform vec3  lightPosition;
@@ -20,6 +20,15 @@ uniform float lightIntensity;
 uniform vec4  lightAmbient;
 uniform vec4  lightDiffuse;
 uniform float lightSpecular;
+
+uniform sampler2D diffuse_map;
+uniform sampler2D specex_map;
+uniform sampler2D normal_map;
+//uniform sampler2D specstr_map;
+
+uniform int hasDiffuse = 1;
+uniform int hasSpecex = 1;
+uniform int hasNormal = 1;
 
 vec4 computePhong(  vec3 light, vec4 lightcol, vec3 pos, vec3 norm, vec3 camPos, float specPower, vec4 ambiant, vec4 diffuse, vec4 specStrength, vec4 specExponent)
 {
@@ -67,17 +76,41 @@ void main()
 {
     //FragColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
     //norm = normalize(norm);
+
+    vec3 normal;
+    vec4 diffuse;
+    vec4 specular_strength;
+
+    if(textureMapping == 1 && hasDiffuse == 1) {
+        diffuse = texture(diffuse_map, textureCoordV);
+    } else {
+        diffuse = lightDiffuse;
+    }
+    
+    if(textureMapping == 1 && hasNormal == 1) {
+        vec4 texture_normal = texture2D(normal_map, textureCoordV);
+        normal = normalize(vec3(texture_normal.rgb * 2.0 - 1.0));
+    } else {
+        normal = normalize(norm);
+    }
+
+    if(textureMapping == 1 && hasSpecex == 1) {
+        specular_strength = texture(specex_map, textureCoordV);
+    } else {
+        specular_strength = vec4(1.);
+    }
+
     vec4 phong_lighting = computePhong(
         lightPosition,
         vec4(lightColor, 1.0),
         worldPosition,
-        norm,
+        normal,
         cameraPosition,
         lightSpecular,
         lightAmbient,
-        lightDiffuse, 
-        vec4(0.), 
-        vec4(0.)
+        diffuse, 
+        specular_strength, 
+        vec4(1.)
     );
     FragColor = phong_lighting * vertexColor;
     //FragColor = vertexColor;

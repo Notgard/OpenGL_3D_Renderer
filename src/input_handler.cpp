@@ -14,6 +14,15 @@ void InputHandler::input_callback(int key, int scancode, int action, int mods, C
     kp.previous = keyPresses[key].current;
     keyPresses[key] = kp;
 
+    if (action == GLFW_PRESS)
+    {
+        keyStates[key] = true;
+    }
+    else if (action == GLFW_RELEASE)
+    {
+        keyStates[key] = false;
+    }
+
     //handle wasd and arrow key movement
     switch (key)
     {
@@ -23,47 +32,49 @@ void InputHandler::input_callback(int key, int scancode, int action, int mods, C
             glfwSetWindowShouldClose(window, GLFW_TRUE);
         }
         break;
-    case GLFW_KEY_W:
-    case GLFW_KEY_UP:
+    case GLFW_KEY_P:
         if (action == GLFW_PRESS)
         {
-            camera->move(CameraMovement::FORWARD);
+            camera->print_camera();
         }
         break;
-    case GLFW_KEY_A:
-    case GLFW_KEY_LEFT:
+    case GLFW_KEY_F:
         if (action == GLFW_PRESS)
         {
-            camera->move(CameraMovement::LEFT);
-        }
-        break;
-    case GLFW_KEY_S:
-    case GLFW_KEY_DOWN:
-        if (action == GLFW_PRESS)
-        {
-            camera->move(CameraMovement::BACKWARD);
-        }
-        break;
-    case GLFW_KEY_D:
-    case GLFW_KEY_RIGHT:
-        if (action == GLFW_PRESS)
-        {
-            camera->move(CameraMovement::RIGHT);
-        }
-        break;
-    case GLFW_KEY_Q:
-        if (action == GLFW_PRESS)
-        {
-            camera->move(CameraMovement::UP);
-        }
-        break;
-    case GLFW_KEY_E:
-        if (action == GLFW_PRESS)
-        {
-            camera->move(CameraMovement::DOWN);
+            camera->switch_camera_mode();
+            camera->reset();
         }
         break;
     default:
         break;
+    }
+}
+
+void InputHandler::process_camera_movement(Camera *camera, double deltaTime) {
+    float velocity = camera->get_move_speed() * deltaTime;
+
+    if (keyStates[GLFW_KEY_W] || keyStates[GLFW_KEY_UP])
+    {
+        camera->move(CameraMovement::FORWARD, velocity);
+    }
+    if (keyStates[GLFW_KEY_S] || keyStates[GLFW_KEY_DOWN])
+    {
+        camera->move(CameraMovement::BACKWARD, velocity);
+    }
+    if (keyStates[GLFW_KEY_A] || keyStates[GLFW_KEY_LEFT])
+    {
+        camera->move(CameraMovement::LEFT, velocity);
+    }
+    if (keyStates[GLFW_KEY_D] || keyStates[GLFW_KEY_RIGHT])
+    {
+        camera->move(CameraMovement::RIGHT, velocity);
+    }
+    if (keyStates[GLFW_KEY_Q] || keyStates[GLFW_KEY_SPACE])
+    {
+        camera->move(CameraMovement::UP, velocity);
+    }
+    if (keyStates[GLFW_KEY_E] || keyStates[GLFW_KEY_LEFT_SHIFT])
+    {
+        camera->move(CameraMovement::DOWN, velocity);
     }
 }

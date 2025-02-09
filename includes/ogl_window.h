@@ -13,7 +13,8 @@ using namespace ui;
 class OGLWindow : public Window
 {
 public:
-    OGLWindow() : isRunning(true) {
+    OGLWindow() : isRunning(true)
+    {
         window = nullptr;
         ui = new UIContext();
         ogl = new OGLRender();
@@ -36,6 +37,11 @@ public:
     void input_handler();
 
     bool is_running() { return isRunning; }
+    
+    void set_cmd_arguments(std::vector<std::string> arguments)
+    {
+        cmd_arguments = arguments;
+    }
 
 private:
     GLFWwindow *window;
@@ -43,12 +49,20 @@ private:
     UIContext *ui;
     OGLRender *ogl;
 
-    //ui
-    SceneView *sceneView;
-    MenuBarComponent *menuBar;
+    // ui
+    ui::SceneView *sceneView;
+    ui::MenuBarComponent *menuBar;
 
-    //input
+    // input
     InputHandler *inputHandler = nullptr;
-    
+    std::vector<std::string> cmd_arguments;
+
     bool isRunning;
+    double deltaTime;
+    double currentTime;
+    double currentFrame;
+    double lastFrame;
+    double fps;
+    double lastX = 0.0, lastY = 0.0;
+    bool mousePressed = false;
 };

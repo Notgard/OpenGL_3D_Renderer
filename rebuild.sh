@@ -24,15 +24,15 @@ cd "$BUILD_DIR"
 
 if [[ "$clean_choice" == "y" || "$clean_choice" == "Y" ]]; then
     clean_build
+    # Re-run cmake configuration
+    echo "Configuring with cmake..."
+    cmake $CMAKE_OPTIONS
 fi
 
-# Re-run cmake configuration
-echo "Configuring with cmake..."
-cmake $CMAKE_OPTIONS
-
 # Build and install
-echo "Building and installing..."
+echo "Building..."
 cmake --build . --target install
+#cmake --build .
 
 echo "Build completed successfully!"
 

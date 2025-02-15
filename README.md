@@ -32,3 +32,18 @@ You can use the `build.sh` or `rebuild.sh` to compile the project without needin
 To start the application, simply use the `start.sh` script which starts the renderer, the scripts additionally prompts you to use either the `--no-nvidia` or `--with-nvidia` flags to use the proper GPU in case of laptop integrated GPU case.
   
 Note that this project was made on Windows Subsystem for Linux (WSL2) running Ubuntu 22.04 with MESA for OpenGL driver support.
+
+## Demo
+
+### Basic model import
+
+![updated_render_demo](img/updated_render_demo.png)
+
+### Multi-object import and independant object handling
+![multi_object_rendering](img/multi_object_rendering.png)
+
+### Texture handling of imported models
+![renderer_texture_handling](img/renderer_texture_handling.png)
+
+### Different camera modes (scene rotation + free movement camera)
+![camera_modes_demo](img/camera_modes_demo.gif)

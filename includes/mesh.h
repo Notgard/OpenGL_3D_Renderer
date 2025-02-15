@@ -53,6 +53,9 @@ public:
     bool init_materials(const aiScene *pScene, const std::string &Filename);
     unsigned int load_texture(const std::string &path);
     void save_texture_data(TextureType type, std::string& fullPath, unsigned int i);
+    unsigned int hash_texture_key(unsigned int materialIndex, TextureType type) {
+        return materialIndex ^ type;
+    }
 
     struct Mesh
     {
@@ -69,15 +72,15 @@ public:
     };
 
     std::vector<std::unique_ptr<Mesh>> meshes;
-    std::map<std::string, unsigned int> textureMap;        // bind texture path to texture index
-    std::map<unsigned int, unsigned int> materialTextures; // bind material index to texture index
-    std::map<unsigned int, unsigned int> textureToType;    // bind texture index to texture type
+    std::unordered_map<std::string, unsigned int> textureMap;        // bind texture path to texture index
+    std::unordered_map<unsigned int, unsigned int> materialTextures; // bind material index to texture index
+    std::unordered_map<unsigned int, unsigned int> textureToType;    // bind texture index to texture type
     bool hasTextures = false;
 
     std::vector<unsigned int> texture_counts;
     double polygon_count = 0;
 
-    std::map<unsigned int, std::string> texture_info = {
+    std::unordered_map<unsigned int, std::string> texture_info = {
         {0, "DIFFUSE"},
         {1, "SPECULAR"},
         {2, "NORMALS"},

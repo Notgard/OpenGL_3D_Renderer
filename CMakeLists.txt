@@ -26,6 +26,7 @@ set(sources
     src/app.cpp 
     src/buffer.cpp 
     src/camera.cpp
+    src/grid.cpp
     src/input_handler.cpp 
     src/functions.cpp
     src/main.cpp
@@ -43,7 +44,8 @@ set(headers
     includes/app.h 
     includes/buffer.h
     includes/camera.h
-    includes/config.h 
+    includes/config.h
+    includes/grid.h 
     includes/functions.h 
     includes/imgui_stdlib.h 
     includes/imgui-style.h 
@@ -93,6 +95,7 @@ add_executable(${CMAKE_PROJECT_NAME} ${sources} ${headers}
     bindings/imgui_impl_opengl3_loader.h
     bindings/stb_image.h
     bindings/stb_image_write.h
+    bindings/imfilebrowser.h
 )
 
 # Specify include directories for the compiler

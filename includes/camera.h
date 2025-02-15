@@ -11,6 +11,7 @@
 #include <glm/gtx/string_cast.hpp>
 
 #include "config.h"
+#include "object.h"
 
 enum class CameraMovement
 {
@@ -84,6 +85,9 @@ public:
 
 	void load_config(Configuration *config);
 
+	void hide() { hide_object = !hide_object; }
+	bool is_object_hidden() { return hide_object; }
+
 private:
 	glm::vec2 get_mouse_delta(double x, double y);
 
@@ -100,7 +104,7 @@ private:
 	glm::vec3 move_pos{0.0f, 0.0f, 0.0f};
 
 	glm::mat4 orientation;
-	glm::mat4 model;
+	//glm::mat4 model;
 	glm::mat4 view;
 	glm::mat4 projection;
 
@@ -128,4 +132,9 @@ private:
 	// mouse inputs
 	double lastX = DEFAULT_MOUSE;
 	double lastY = DEFAULT_MOUSE;
+
+	//keep track of the currently selected object in the user interface
+	int selected_object = 0;
+
+	bool hide_object = false;
 };

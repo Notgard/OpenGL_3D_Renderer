@@ -11,6 +11,8 @@ std::string currentTime(std::chrono::time_point<std::chrono::system_clock> now);
 
 bool endsWith(std::string const &originalString, std::string const &ending);
 
+std::string getFileName(const std::string &s);
+
 static auto vector_getter = [](void *vec, int idx, const char **out_text)
 {
     auto &vector = *static_cast<std::vector<std::string> *>(vec);
@@ -21,3 +23,5 @@ static auto vector_getter = [](void *vec, int idx, const char **out_text)
     *out_text = vector.at(idx).c_str();
     return true;
 };
+
+float random_float(float min, float max);

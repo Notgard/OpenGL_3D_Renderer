@@ -36,3 +36,18 @@ bool endsWith(std::string const &originalString, std::string const &ending)
         return false;
     }
 }
+
+//function to get filename from path
+std::string getFileName(const std::string &s) {
+    char sep = '/';
+    size_t i = s.rfind(sep, s.length());
+    if (i != std::string::npos) {
+        return(s.substr(i+1, s.length() - i));
+    }
+    return("");
+}
+
+float random_float(float min, float max)
+{
+    return min + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (max - min)));
+}

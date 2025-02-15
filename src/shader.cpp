@@ -2,19 +2,21 @@
 
 #include "config.h"
 
-bool Shader::compile_and_load(const char *vertexShaderSource, const char *fragmentShaderSource)
+bool Shader::compile_and_load(const char *vertexShaderSource, const char *fragmentShaderSource, const char *geometryShaderSource)
 {
+    bool geometryShader = geometryShaderSource != nullptr;
+
     // vertex shader
     unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
     glCompileShader(vertexShader);
     // check for shader compile errors
     int success;
-    char infoLog[512];
+    char infoLog[1024];
     glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
     if (!success)
     {
-        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+        glGetShaderInfoLog(vertexShader, 1024, NULL, infoLog);
         std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n"
                   << infoLog << std::endl;
         return false;
@@ -28,10 +30,28 @@ bool Shader::compile_and_load(const char *vertexShaderSource, const char *fragme
     glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
     if (!success)
     {
-        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
+        glGetShaderInfoLog(fragmentShader, 1024, NULL, infoLog);
         std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n"
                   << infoLog << std::endl;
         return false;
+    }
+
+    // geometry shader
+    if (geometryShader)
+    {
+        std::cout << "Compiling geometry shader" << std::endl;
+        unsigned int geometryShader = glCreateShader(GL_GEOMETRY_SHADER);
+        glShaderSource(geometryShader, 1, &geometryShaderSource, NULL);
+        glCompileShader(geometryShader);
+        // check for shader compile errors
+        glGetShaderiv(geometryShader, GL_COMPILE_STATUS, &success);
+        if (!success)
+        {
+            glGetShaderInfoLog(geometryShader, 1024, NULL, infoLog);
+            std::cout << "ERROR::SHADER::GEOMETRY::COMPILATION_FAILED\n"
+                      << infoLog << std::endl;
+            return false;
+        }
     }
 
     // load the shader program
@@ -40,6 +60,11 @@ bool Shader::compile_and_load(const char *vertexShaderSource, const char *fragme
     this->shaderProgram = glCreateProgram();
     glAttachShader(shaderProgram, vertexShader);
     glAttachShader(shaderProgram, fragmentShader);
+    if(geometryShader)
+    {
+        std::cout << "Attaching geometry shader" << std::endl;
+        glAttachShader(shaderProgram, geometryShader);
+    }
     glLinkProgram(shaderProgram);
     glValidateProgram(shaderProgram);
 
@@ -55,6 +80,10 @@ bool Shader::compile_and_load(const char *vertexShaderSource, const char *fragme
     // delete the shaders as they're linked into our program now and no longer necessary
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
+    if(geometryShader)
+    {
+        glDeleteShader(geometryShader);
+    }
 
     return true;
 }
@@ -82,12 +111,42 @@ std::string Shader::read_shader(std::string current_path, int vertex_type)
     case FRAGMENT_SHADER:
         shader_path += FRAGMENT_SHADER_NAME;
         break;
+    case GEOMETRY_SHADER:
+        shader_path += GEOMETRY_SHADER_NAME;
+        break;
     default:
         return NULL;
     }
 
     std::ifstream shader(shader_path);
-    std::string shader_code;
+    std::string shader_code = "";
+
+    if (shader.is_open())
+    {
+        std::string line;
+        while (std::getline(shader, line))
+        {
+            shader_code += line + "\n";
+        }
+        shader.close();
+    }
+    else
+    {
+        std::cerr << "[ERROR] Couldn't open shader file: " << shader_path << std::endl;
+    }
+
+    return shader_code;
+}
+
+std::string Shader::read_shader(std::string current_path, std::string shader_name)
+{
+    // reads a shader from a txt file and returns it as a string
+    std::string shader_path = current_path + SHADER_FOLDER;
+
+    shader_path += shader_name;
+
+    std::ifstream shader(shader_path);
+    std::string shader_code = "";
 
     if (shader.is_open())
     {

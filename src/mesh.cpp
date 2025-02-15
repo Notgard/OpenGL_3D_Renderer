@@ -54,7 +54,7 @@ void MeshHandler::MeshHandler::clear()
     materialTextures.clear();
 }
 
-bool MeshHandler::load_mesh(const std::string& filename)
+bool MeshHandler::load_mesh(const std::string &filename)
 {
     // Release the previously loaded mesh (if it exists)
     // clear();
@@ -95,7 +95,7 @@ bool MeshHandler::init_from_scene(const aiScene *scene, const std::string &filen
 
 void MeshHandler::init_mesh(unsigned int index, const aiMesh *paiMesh)
 {
-    //std::cout << "Initializing mesh: " << index << std::endl;
+    // std::cout << "Initializing mesh: " << index << std::endl;
 
     assert(index < meshes.size());
 
@@ -110,7 +110,7 @@ void MeshHandler::init_mesh(unsigned int index, const aiMesh *paiMesh)
 
     const aiVector3D Zero3D(0.0f, 0.0f, 0.0f);
 
-    //std::cout << "Pushing vertices" << std::endl;
+    // std::cout << "Pushing vertices" << std::endl;
     for (unsigned int i = 0; i < paiMesh->mNumVertices; i++)
     {
         const aiVector3D *pPos = &(paiMesh->mVertices[i]);
@@ -126,7 +126,7 @@ void MeshHandler::init_mesh(unsigned int index, const aiMesh *paiMesh)
 
         vertices.push_back(v);
     }
-    //std::cout << "Pushing indices" << std::endl;
+    // std::cout << "Pushing indices" << std::endl;
     for (unsigned int i = 0; i < paiMesh->mNumFaces; i++)
     {
         const aiFace &Face = paiMesh->mFaces[i];
@@ -138,22 +138,29 @@ void MeshHandler::init_mesh(unsigned int index, const aiMesh *paiMesh)
     }
 
     std::cout << "Polygon count for mesh: " << index << " is " << polygon_count << std::endl;
-    //std::cout << "Initializing mesh: " << index << " with " << vertices.size() << " vertices and " << indices.size() << " indices" << std::endl;
+    // std::cout << "Initializing mesh: " << index << " with " << vertices.size() << " vertices and " << indices.size() << " indices" << std::endl;
     meshes[index]->init(vertices, indices);
 }
 
-void MeshHandler::save_texture_data(TextureType type, std::string& fullPath, unsigned int i)
+void MeshHandler::save_texture_data(TextureType type, std::string &fullPath, unsigned int meterialIndex)
 {
-    std::cout << "Texture found for material: " << i << "at path: " << fullPath << std::endl;
+    std::cout << RED << "Texture found for material: " << meterialIndex << " at path: " << fullPath << RESET << std::endl;
 
     // Check if the texture has already been loaded
     if (textureMap.find(fullPath) == textureMap.end())
     {
+        std::cout << "Texture not loaded: " << fullPath << std::endl;
         textureMap[fullPath] = load_texture(fullPath);
     }
 
-    materialTextures[i] = textureMap[fullPath];
-    textureToType[materialTextures[i]] = type;
+    unsigned int textureID = textureMap[fullPath];
+    unsigned int hash = hash_texture_key(meterialIndex, type);
+    materialTextures[hash] = textureID;
+    textureToType[materialTextures[hash]] = type;
+
+    std::cout << YELLOW << "Assigned Texture ID: " << textureMap[fullPath]
+              << " for Material: " << meterialIndex
+              << " Type: " << type << RESET << std::endl;
 }
 
 bool MeshHandler::init_materials(const aiScene *scene, const std::string &filename)
@@ -191,7 +198,7 @@ bool MeshHandler::init_materials(const aiScene *scene, const std::string &filena
         texture_counts = {num_textures, num_spec, num_norm, num_height, num_ambi, num_emis, num_shine, num_opac, num_disp, num_light, num_refl, num_unknown};
         for (unsigned int j = 0; j < texture_counts.size(); j++)
         {
-            if (texture_counts[j] > 0)
+            if (texture_counts[j] >= 1)
             {
                 std::cout << "Material: " << i << " Texture type: " << texture_info[j] << " count: " << texture_counts[j] << std::endl;
             }
@@ -211,19 +218,27 @@ bool MeshHandler::init_materials(const aiScene *scene, const std::string &filena
                 std::string fullPath = directory + "/" + Path.C_Str();
                 save_texture_data(DIFFUSE, fullPath, i);
             }
-            else if (pMaterial->GetTexture(aiTextureType_SPECULAR, 0, &Path) == AI_SUCCESS)
+            else
+            {
+                std::cout << "No Diffuse texture found for material: " << i << std::endl;
+            }
+            if (pMaterial->GetTexture(aiTextureType_SPECULAR, 0, &Path) == AI_SUCCESS)
             {
                 std::string fullPath = directory + "/" + Path.C_Str();
                 save_texture_data(SPECULAR, fullPath, i);
             }
-            else if (pMaterial->GetTexture(aiTextureType_HEIGHT, 0, &Path) == AI_SUCCESS)
+            else
+            {
+                std::cout << "No Specular texture found for material: " << i << std::endl;
+            }
+            if (pMaterial->GetTexture(aiTextureType_HEIGHT, 0, &Path) == AI_SUCCESS)
             {
                 std::string fullPath = directory + "/" + Path.C_Str();
                 save_texture_data(HEIGHT, fullPath, i);
             }
             else
             {
-                std::cout << "No texture found for material: " << i << std::endl;
+                std::cout << "No Normal/Height bump texture found for material: " << i << std::endl;
             }
         }
         else
@@ -232,17 +247,44 @@ bool MeshHandler::init_materials(const aiScene *scene, const std::string &filena
         }
     }
 
+    std::cout << "Loaded textures: " << textureMap.size() << std::endl;
+
+    // print texturemap
+    for (auto &texture : textureMap)
+    {
+        std::cout << "TextureMap: " << texture.first << " : " << texture.second << std::endl;
+    }
+    // print materialTextures
+    for (auto &material : materialTextures)
+    {
+        std::cout << "MaterialTextures: " << material.first << " : " << material.second << std::endl;
+    }
+    // print textureToType
+    for (auto &texture : textureToType)
+    {
+        std::cout << "TextureToType: " << texture.first << " : " << texture.second << std::endl;
+    }
+
     return true;
 }
 
+// TODO: needs to be able to manage multiple textures, for now if called multiple times for different textures,
+//  i think it writes over the same texture map
 unsigned int MeshHandler::load_texture(const std::string &path)
 {
+    // first check if the texture has already been loaded
+    if (textureMap.find(path) != textureMap.end())
+    {
+        std::cout << "Texture already loaded: " << path << std::endl;
+        return textureMap[path];
+    }
+
     int x, y, n;
     unsigned char *data = stbi_load(path.c_str(), &x, &y, &n, STBI_rgb_alpha);
     if (!data)
     {
-        std::cerr << "Failed to load texture: " << path << std::endl;
-        stbi_image_free(data);
+        std::cerr << RED << "Failed to load texture: " << path << RESET << std::endl;
+        // stbi_image_free(data);
         return 0;
     }
 
@@ -277,6 +319,9 @@ void MeshHandler::render(Shader *shader)
     if (!hasTextures)
     {
         shader->set_int("textureMapping", 0);
+        shader->set_int("hasDiffuse", 0);
+        shader->set_int("hasNormal", 0);
+        shader->set_int("hasSpecex", 0);
     }
 
     for (unsigned int i = 0; i < meshes.size(); i++)
@@ -284,8 +329,48 @@ void MeshHandler::render(Shader *shader)
         unsigned int textureID = 0;
         unsigned int textureType = 0;
         unsigned int material_index = meshes[i]->materialIndex;
+        unsigned int texture_hash = 0;
 
-        // Check if the material has a texture
+        // Bind Diffuse
+        texture_hash = hash_texture_key(material_index, DIFFUSE);
+        if (texture_counts[DIFFUSE] >= 1)
+        {
+            shader->set_int("hasDiffuse", 1);
+        }
+        if (materialTextures.find(texture_hash) != materialTextures.end())
+        {
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, materialTextures[texture_hash]);
+            shader->set_int(std::string(TEXTURE_DIFFUSE), DIFFUSE);
+        }
+
+        // Bind Specular
+        texture_hash = hash_texture_key(material_index, SPECULAR);
+        if (texture_counts[SPECULAR] >= 1)
+        {
+            shader->set_int("hasSpecex", 1);
+        }
+        if (materialTextures.find(texture_hash) != materialTextures.end())
+        {
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_2D, materialTextures[texture_hash]);
+            shader->set_int(std::string(TEXTURE_SPECULAR), SPECULAR);
+        }
+
+        // Bind Normal
+        texture_hash = hash_texture_key(material_index, HEIGHT);
+        if (texture_counts[HEIGHT] >= 1 || texture_counts[NORMALS] >= 1)
+        {
+            shader->set_int("hasNormal", 1);
+        }
+        if (materialTextures.find(texture_hash) != materialTextures.end())
+        {
+            glActiveTexture(GL_TEXTURE2);
+            glBindTexture(GL_TEXTURE_2D, materialTextures[texture_hash]);
+            shader->set_int(std::string(TEXTURE_NORMAL), NORMALS);
+        }
+
+/*         // Check if the material has a texture
         if (materialTextures.find(material_index) != materialTextures.end())
         {
             textureID = materialTextures[material_index];
@@ -327,7 +412,7 @@ void MeshHandler::render(Shader *shader)
                 shader->set_int(std::string(TEXTURE_NORMAL), NORMALS);
                 break;
             }
-        }
+        } */
 
         // Draw the mesh
         if (!meshes[i])

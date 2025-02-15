@@ -8,6 +8,7 @@
 
 #include "functions.h"
 #include "imgui-style.h"
+#include "imfilebrowser.h"
 
 #include "config.h"
 
@@ -32,9 +33,12 @@ namespace ui
         Configuration *config;
 
         void camera_load_configuration(Camera *camera);
-        void light_load_configuration(std::vector<Light *> lights);
+        void light_load_configuration(std::unique_ptr<LightHandler> &lights);
         void shader_load_configuration(Shader *shader);
 
+        int object_index = -1;
         bool enable_input = true;
+        ImGui::FileBrowser fileDialog;
+        std::vector<std::string> files;
     };
 }

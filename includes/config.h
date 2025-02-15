@@ -16,9 +16,14 @@
 #define SHADER_FOLDER "/shaders/"
 
 #define VERTEX_SHADER 0
-#define VERTEX_SHADER_NAME "vertex.txt"
+#define VERTEX_SHADER_NAME "vertex.vert"
 #define FRAGMENT_SHADER 1
-#define FRAGMENT_SHADER_NAME "fragment.txt"
+#define FRAGMENT_SHADER_NAME "fragment.frag"
+#define GEOMETRY_SHADER 2
+#define GEOMETRY_SHADER_NAME "geometry.geom"
+
+#define LIGHT_VERTEX_SHADER_NAME "light.vert"
+#define LIGHT_FRAGMENT_SHADER_NAME "light.frag"
 
 #define BACKGROUND_R 0.6f
 #define BACKGROUND_G 0.6f
@@ -47,6 +52,25 @@
 
 // DPI
 #define HIGH_DPI_SCALE_FACTOR 1.0f
+
+//the following are UBUNTU/LINUX, and MacOS ONLY terminal color codes.
+#define RESET   "\033[0m"
+#define BLACK   "\033[30m"      /* Black */
+#define RED     "\033[31m"      /* Red */
+#define GREEN   "\033[32m"      /* Green */
+#define YELLOW  "\033[33m"      /* Yellow */
+#define BLUE    "\033[34m"      /* Blue */
+#define MAGENTA "\033[35m"      /* Magenta */
+#define CYAN    "\033[36m"      /* Cyan */
+#define WHITE   "\033[37m"      /* White */
+#define BOLDBLACK   "\033[1m\033[30m"      /* Bold Black */
+#define BOLDRED     "\033[1m\033[31m"      /* Bold Red */
+#define BOLDGREEN   "\033[1m\033[32m"      /* Bold Green */
+#define BOLDYELLOW  "\033[1m\033[33m"      /* Bold Yellow */
+#define BOLDBLUE    "\033[1m\033[34m"      /* Bold Blue */
+#define BOLDMAGENTA "\033[1m\033[35m"      /* Bold Magenta */
+#define BOLDCYAN    "\033[1m\033[36m"      /* Bold Cyan */
+#define BOLDWHITE   "\033[1m\033[37m"      /* Bold White */
 
 // chip 8 emulator
 //  Constants for CHIP-8 screen
@@ -100,7 +124,7 @@ struct Configuration
         camera_far = 300.0f;
         free_camera = true;
         camera_move_speed = 3.5f;
-        light_position = glm::vec3(1.5f, 3.5f, 3.0f);
+        light_position = glm::vec3(-1.5f, 3.5f, 3.0f);
         light_color[0] = 1.0f;
         light_color[1] = 1.0f;
         light_color[2] = 1.0f;

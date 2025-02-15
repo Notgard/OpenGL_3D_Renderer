@@ -45,6 +45,12 @@ void InputHandler::input_callback(int key, int scancode, int action, int mods, C
             camera->reset();
         }
         break;
+    case GLFW_KEY_H:
+        if (action == GLFW_PRESS)
+        {
+            camera->hide();
+        }
+        break;
     default:
         break;
     }

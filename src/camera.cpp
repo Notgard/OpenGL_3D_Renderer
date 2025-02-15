@@ -9,7 +9,7 @@ Camera::Camera()
 	this->near = 0.1f;
 	this->far = 200.0f;
 
-	this->model = glm::mat4(1.0f);
+	//this->model = glm::mat4(1.0f);
 	update_view_matrix();
 	update_projection_matrix();
 }
@@ -66,7 +66,7 @@ void Camera::set_aspect_ratio(const float aspectRatio)
 {
 	if (this->aspectRatio != aspectRatio)
 	{
-		std::cout << "Aspect ratio changed from " << this->aspectRatio << " to " << aspectRatio << std::endl;
+		//std::cout << "Aspect ratio changed from " << this->aspectRatio << " to " << aspectRatio << std::endl;
 		this->aspectRatio = aspectRatio;
 		update_projection_matrix();
 	}
@@ -237,7 +237,7 @@ void Camera::update_projection_matrix()
 
 void Camera::update(Shader *shader)
 {
-	shader->set_model(this->model);
+	//shader->set_model(this->model);
 	shader->set_view(get_view_matrix());
 	shader->set_projection(get_projection_matrix());
 	shader->set_vec3("cameraPosition", this->position);
@@ -290,7 +290,10 @@ void Camera::on_mouse_move(double x, double y, int width, int height, MouseButto
 	}
 	else if (button == MouseButtons::RIGHT_CLICK)
 	{
-		// TODO
+		// TODO: translate the mesh in the scene
+		float sensitivity = 0.01f;
+		glm::vec3 translation(delta.x * sensitivity, -delta.y * sensitivity, 0.0f);
+        //selectedObject->translate(translation);
 	}
 	else if (button == MouseButtons::MIDDLE_CLICK)
 	{

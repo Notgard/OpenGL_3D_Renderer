@@ -29,9 +29,10 @@ private:
 public:
     Shader() = default;
 
-    bool compile_and_load(const char *vertexShaderSource, const char *fragmentShaderSource);
+    bool compile_and_load(const char *vertexShaderSource, const char *fragmentShaderSource, const char *geometryShaderSource = nullptr);
     
     std::string read_shader(std::string current_path, int vertex_type);
+    std::string read_shader(std::string current_path, std::string shader_name);
 
     void use();
 

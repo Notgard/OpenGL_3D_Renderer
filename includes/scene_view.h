@@ -6,6 +6,7 @@
 #include "camera.h"
 #include "light.h"
 #include "object.h"
+#include "grid.h"
 
 #include "config.h"
 
@@ -34,25 +35,25 @@ namespace ui
         {
             shader->unload();
             frameBuffer->delete_buffers();
-            vertexBuffer->delete_buffers();
+            //vertexBuffer->delete_buffers();
             safe_delete(shader);
-            safe_delete(vertexBuffer);
+            //safe_delete(vertexBuffer);
             safe_delete(frameBuffer);
-            safe_delete(meshHandler);
+            //safe_delete(meshHandler);
             //safe_delete(objectHandler);
             safe_delete(camera);
             // delete lights
-            for (auto light : lights)
-            {
-                safe_delete(light);
-            }
+            //for (auto light : lights)
+            //{
+            //    safe_delete(light);
+            //}
         };
 
         std::tuple<std::vector<float>, std::vector<unsigned int>> init_scene_vectors();
 
         void resize(int width, int height);
 
-        void render();
+        void render(double time);
 
         void on_mouse_wheel(double delta);
 
@@ -62,7 +63,8 @@ namespace ui
 
         bool available_input() { return enable_input; }
 
-        std::vector<Light *> get_lights() { return lights; }
+        //std::vector<Light *> get_lights() { return lights; }
+        std::unique_ptr<LightHandler> &get_light_handler() { return lightHandler; }
 
         Shader *get_shader() { return shader; }
 
@@ -85,18 +87,44 @@ namespace ui
             objectHandler->toggle_object(GIZMO_INDEX);
         }
 
+        void set_selected_object(int index)
+        {
+            if(camera->is_object_hidden()) {
+                objectHandler->toggle_object(index);
+            }
+        }
+
+        void add_object(const std::string &filename)
+        {
+            objectHandler->load_object(filename);
+        }
+
+        std::vector<std::string> get_object_names()
+        {
+            return objectHandler->get_object_name_list();
+        }
+
+        std::unique_ptr<Object> &get_selected_object(int index)
+        {
+            return objectHandler->get_object(index);
+        }
+
+        void add_random_light();
+        
     private:
         int width;
         int height;
         Shader *shader;
         renderer::OGLFrameBuffer *frameBuffer;
-        renderer::OGLVertexBuffer *vertexBuffer;
-        MeshHandler *meshHandler;
+        
+        std::unique_ptr<Grid> grid;
+        //MeshHandler *meshHandler;
         //ObjectHandler *objectHandler;
         std::unique_ptr<ObjectHandler> objectHandler;
+        std::unique_ptr<LightHandler> lightHandler;
 
         Camera *camera;
-        std::vector<Light *> lights;
+        //std::vector<Light *> lights;
         bool enable_input = true;
         bool enable_grid = true;
         bool enable_gizmo = true;

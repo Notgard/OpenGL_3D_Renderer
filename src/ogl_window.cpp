@@ -55,7 +55,7 @@ void OGLWindow::render()
     //std::cout << "Render" << std::endl;
 
     menuBar->render(sceneView);
-    sceneView->render();
+    sceneView->render(currentFrame);
 
     ui->post_render();
     ogl->post_render();

@@ -1,16 +1,5 @@
 #include "object.h"
 
-ObjectHandler::Object::Object()
-{
-    meshes = std::make_unique<MeshHandler>();
-}
-
-ObjectHandler::Object::~Object()
-{
-    meshes->clear();
-    //safe_delete(meshes);
-}
-
 ObjectHandler::ObjectHandler()
 {
 }
@@ -68,6 +57,7 @@ bool ObjectHandler::load_object(const std::string &filename)
         return false;
     }
     std::cout << "Object loaded: " << filename << std::endl;
+    new_object->name = getFileName(filename);
     object_bitmap.push_back(SHOW_OBJECT);
     new_object->polygon_count = new_object->meshes->get_polygon_count();
     //std::cout << "Polygon count: " << new_object->polygon_count << std::endl;
@@ -89,6 +79,7 @@ void ObjectHandler::render(Shader *shader)
         if (object_bitmap[i] != HIDE_OBJECT)
         {
             //std::cout << "Rendering object: " << i << std::endl;
+            shader->set_model(objects[i]->model);
             objects[i]->meshes->render(shader);
         }
     }
